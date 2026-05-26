@@ -9,8 +9,9 @@ into ~2 (assess fan-out is one batch, gen+score is one batch each).
 from __future__ import annotations
 
 import asyncio
-import os
 from typing import Any, Dict, List, Optional, Sequence
+
+from memmark.llm.config import resolve
 
 
 class AsyncOpenAIChatClient:
@@ -32,31 +33,24 @@ class AsyncOpenAIChatClient:
                 raise RuntimeError(
                     "openai package is required for AsyncOpenAIChatClient"
                 ) from exc
-            resolved_api_key = (
-                api_key
-                or os.getenv("MEMMARK_API_KEY")
-                or os.getenv("OPENAI_API_KEY")
-                or os.getenv("DEEPSEEK_API_KEY")
-                or os.getenv("DASHSCOPE_API_KEY")
+            resolved_api_key = resolve(
+                api_key,
+                "MEMMARK_API_KEY",
+                "OPENAI_API_KEY",
+                "DEEPSEEK_API_KEY",
+                "DASHSCOPE_API_KEY",
             )
             if not resolved_api_key:
                 raise RuntimeError(
                     "Set MEMMARK_API_KEY / OPENAI_API_KEY / DEEPSEEK_API_KEY / DASHSCOPE_API_KEY"
                 )
-            resolved_base_url = (
-                base_url
-                or os.getenv("MEMMARK_BASE_URL")
-                or os.getenv("TARGET_LLM_BASE")
-            )
+            resolved_base_url = resolve(base_url, "MEMMARK_BASE_URL", "TARGET_LLM_BASE")
             self.client = AsyncOpenAI(
                 api_key=resolved_api_key,
                 base_url=resolved_base_url,
             )
         self.model = (
-            model
-            or os.getenv("MEMMARK_MODEL")
-            or os.getenv("TARGET_LLM_MODEL")
-            or "deepseek-chat"
+            resolve(model, "MEMMARK_MODEL", "TARGET_LLM_MODEL") or "deepseek-chat"
         )
         self._sem = asyncio.Semaphore(max_concurrency)
 

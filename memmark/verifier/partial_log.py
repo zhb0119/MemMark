@@ -21,24 +21,19 @@ from typing import List, Optional, Sequence
 
 from memmark.core.commitment import make_commitment
 from memmark.core.decoder import decode_memory_transition
-from memmark.core.merkle_log import (
-    merkle_proof,
-    merkle_root,
-    verify_signature,
-)
+from memmark.core.merkle_log import merkle_root, verify_signature
 from memmark.core.types import AuditRecord, DecisionPoint, SessionHeader
+from memmark.verifier._common import (
+    AnchorVerificationResult,
+    bit_recovery_rate,
+    expected_payload_slice,
+    verify_inclusion_proof,
+)
 
 
 @dataclass(frozen=True)
-class PartialLogVerificationResult:
-    anchor_signature_valid: bool
-    rebuilt_root: str
-    anchor_root: str
-    root_matches: bool
-    leaf_results: List[dict]
-    bits_recovered: int
-    bits_total: int
-    bit_recovery_rate: float
+class PartialLogVerificationResult(AnchorVerificationResult):
+    pass
 
 
 def verify_partial_log(
@@ -67,13 +62,8 @@ def verify_partial_log(
     bits_total = 0
     revealed_set = set(revealed_indices)
 
-    # Use each audit's stored absolute position (bit_index_after - slice)
-    # rather than a running sum, so partial audit sets stay aligned to
-    # the original payload (see same note in verifier/in_record.py).
     for idx, audit in enumerate(full_audits):
-        slice_len = audit.bits_embedded
-        bit_start = max(0, audit.bit_index_after - slice_len)
-        expected = payload_bits[bit_start : bit_start + slice_len]
+        expected, slice_len = expected_payload_slice(audit, payload_bits)
         bits_total += slice_len
 
         if idx not in revealed_set:
@@ -96,16 +86,7 @@ def verify_partial_log(
             keep_reveal=False,
         )
         commit_ok = rebuilt.commitment == audit.commitment
-
-        stored_proof = getattr(audit, "merkle_inclusion_proof", None)
-        if stored_proof is not None:
-            proof_ok = stored_proof.verify() and stored_proof.root == anchor.root
-        else:
-            try:
-                proof = merkle_proof(leaves, idx)
-                proof_ok = proof.verify() and proof.root == anchor.root
-            except IndexError:
-                proof_ok = False
+        proof_ok = verify_inclusion_proof(audit, leaves, idx, anchor.root)
 
         decoded_bits = decode_memory_transition(
             decision, selected_candidate_id=audit.selected_candidate_id
@@ -137,7 +118,5 @@ def verify_partial_log(
         leaf_results=leaf_results,
         bits_recovered=bits_recovered,
         bits_total=bits_total,
-        bit_recovery_rate=(
-            float(bits_recovered) / bits_total if bits_total else 0.0
-        ),
+        bit_recovery_rate=bit_recovery_rate(bits_recovered, bits_total),
     )

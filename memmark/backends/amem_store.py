@@ -17,7 +17,6 @@ from __future__ import annotations
 import contextlib
 import io
 import os
-import re
 from typing import Any, Dict, List, Optional
 
 from memmark.backends.base import MemoryBackendAdapter, _string_topk
@@ -26,12 +25,6 @@ try:  # real A-MEM SDK
     from agentic_memory.memory_system import AgenticMemorySystem  # type: ignore
 except ModuleNotFoundError:  # pragma: no cover - optional dependency
     AgenticMemorySystem = None  # type: ignore
-
-
-def _strip_code_fence(text: str) -> str:
-    s = (text or "").strip()
-    m = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", s, re.DOTALL | re.IGNORECASE)
-    return m.group(1) if m else s
 
 
 def _ensure_hf_download_compat() -> None:

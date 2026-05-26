@@ -28,24 +28,18 @@ from typing import Dict, List, Sequence
 from memmark.core.commitment import make_commitment
 from memmark.core.context import derive_nonce
 from memmark.core.decoder import decode_memory_transition
-from memmark.core.merkle_log import (
-    merkle_proof,
-    merkle_root,
-    verify_signature,
-)
+from memmark.core.merkle_log import merkle_root, verify_signature
 from memmark.core.types import AuditRecord, DecisionPoint, SessionHeader
+from memmark.verifier._common import (
+    AnchorVerificationResult,
+    bit_recovery_rate,
+    expected_payload_slice,
+    verify_inclusion_proof,
+)
 
 
 @dataclass(frozen=True)
-class InRecordVerificationResult:
-    anchor_signature_valid: bool
-    rebuilt_root: str
-    anchor_root: str
-    root_matches: bool
-    leaf_results: List[dict]
-    bits_recovered: int
-    bits_total: int
-    bit_recovery_rate: float
+class InRecordVerificationResult(AnchorVerificationResult):
     carrier_breakdown: Dict[str, dict] = field(default_factory=dict)
 
 
@@ -78,19 +72,8 @@ def verify_in_record(
         lambda: {"bits_recovered": 0, "bits_total": 0, "leaves": 0}
     )
 
-    # Each audit records its ABSOLUTE position in payload_bits via
-    # ``bit_index_after`` (= prefix length after this audit's bits were
-    # appended at seal time). We must NOT use a running sum over the
-    # iterated audit list — when the attacker prunes leaves the running
-    # sum compresses positions and surviving audits get matched against
-    # wrong slices of payload_bits, killing bits_match even though
-    # Method B inclusion proofs still verify. Use each audit's stored
-    # absolute position so partial audit sets stay aligned to the
-    # original payload.
     for idx, audit in enumerate(audit_records):
-        slice_len = audit.bits_embedded
-        bit_start = max(0, audit.bit_index_after - slice_len)
-        expected = payload_bits[bit_start : bit_start + slice_len]
+        expected, slice_len = expected_payload_slice(audit, payload_bits)
         bits_total += slice_len
 
         # The verifier always re-derives nonce_t from the supplied secret
@@ -129,23 +112,7 @@ def verify_in_record(
             keep_reveal=False,
         )
         commit_ok = rebuilt.commitment == audit.commitment
-
-        # Prefer the seal-time per-leaf inclusion proof stored on the
-        # audit (Method B): each leaf verifies independently against
-        # anchor.root, so structural attacks like pruning / dedup /
-        # poisoning produce smooth bit_recovery degradation instead of
-        # a rebuilt-root mismatch killing every remaining leaf at once.
-        # Fallback to rebuilt-tree proof for legacy audits without the
-        # stored proof.
-        stored_proof = getattr(audit, "merkle_inclusion_proof", None)
-        if stored_proof is not None:
-            proof_ok = stored_proof.verify() and stored_proof.root == anchor.root
-        else:
-            try:
-                proof = merkle_proof(leaves, idx)
-                proof_ok = proof.verify() and proof.root == anchor.root
-            except IndexError:
-                proof_ok = False
+        proof_ok = verify_inclusion_proof(audit, leaves, idx, anchor.root)
 
         decoded_bits = decode_memory_transition(
             decision, selected_candidate_id=audit.selected_candidate_id
@@ -180,9 +147,8 @@ def verify_in_record(
             "leaves": s["leaves"],
             "bits_total": s["bits_total"],
             "bits_recovered": s["bits_recovered"],
-            "bit_recovery_rate": (
-                float(s["bits_recovered"]) / s["bits_total"]
-                if s["bits_total"] else 0.0
+            "bit_recovery_rate": bit_recovery_rate(
+                s["bits_recovered"], s["bits_total"]
             ),
         }
         for tau, s in carrier_stats.items()
@@ -196,8 +162,6 @@ def verify_in_record(
         leaf_results=leaf_results,
         bits_recovered=bits_recovered,
         bits_total=bits_total,
-        bit_recovery_rate=(
-            float(bits_recovered) / bits_total if bits_total else 0.0
-        ),
+        bit_recovery_rate=bit_recovery_rate(bits_recovered, bits_total),
         carrier_breakdown=carrier_breakdown,
     )

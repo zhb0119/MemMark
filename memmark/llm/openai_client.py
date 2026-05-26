@@ -4,6 +4,8 @@ import json
 import os
 from typing import Any, Dict, List, Optional
 
+from memmark.llm.config import first_env, resolve
+
 
 class OpenAIChatClient:
     def __init__(
@@ -21,10 +23,18 @@ class OpenAIChatClient:
                 from openai import OpenAI
             except ModuleNotFoundError as exc:
                 raise RuntimeError("openai package is required for LLMMemoryAgent") from exc
-            resolved_api_key = api_key or os.getenv("OPENAI_API_KEY") or os.getenv("MEMMARK_API_KEY") or os.getenv("TARGET_LLM_API_KEY") or os.getenv("DEEPSEEK_API_KEY")
+            resolved_api_key = resolve(
+                api_key,
+                "OPENAI_API_KEY",
+                "MEMMARK_API_KEY",
+                "TARGET_LLM_API_KEY",
+                "DEEPSEEK_API_KEY",
+            )
             if not resolved_api_key:
                 raise RuntimeError("Set OPENAI_API_KEY, MEMMARK_API_KEY, TARGET_LLM_API_KEY, or DEEPSEEK_API_KEY")
-            resolved_base_url = base_url or os.getenv("OPENAI_BASE_URL") or os.getenv("MEMMARK_BASE_URL") or os.getenv("TARGET_LLM_BASE")
+            resolved_base_url = resolve(
+                base_url, "OPENAI_BASE_URL", "MEMMARK_BASE_URL", "TARGET_LLM_BASE"
+            )
             default_headers = self._default_headers()
             timeout = self._timeout()
             self.client = OpenAI(
@@ -33,7 +43,10 @@ class OpenAIChatClient:
                 default_headers=default_headers or None,
                 timeout=timeout,
             )
-        self.model = model or os.getenv("OPENAI_MODEL") or os.getenv("MEMMARK_MODEL") or os.getenv("TARGET_LLM_MODEL") or "deepseek-chat"
+        self.model = (
+            resolve(model, "OPENAI_MODEL", "MEMMARK_MODEL", "TARGET_LLM_MODEL")
+            or "deepseek-chat"
+        )
 
     def complete(
         self,
@@ -63,10 +76,8 @@ class OpenAIChatClient:
         return {"enable_thinking": False}
 
     def _resolved_extra_body(self) -> Optional[Dict[str, Any]]:
-        env_value = (
-            os.getenv("TARGET_LLM_EXTRA_BODY")
-            or os.getenv("MEMMARK_EXTRA_BODY")
-            or os.getenv("OPENAI_EXTRA_BODY")
+        env_value = first_env(
+            "TARGET_LLM_EXTRA_BODY", "MEMMARK_EXTRA_BODY", "OPENAI_EXTRA_BODY"
         )
         if env_value:
             try:
@@ -105,7 +116,7 @@ class OpenAIChatClient:
 
     @staticmethod
     def _timeout() -> Optional[float]:
-        raw = os.getenv("MEMMARK_OPENAI_TIMEOUT") or os.getenv("OPENAI_TIMEOUT")
+        raw = first_env("MEMMARK_OPENAI_TIMEOUT", "OPENAI_TIMEOUT")
         if not raw:
             return None
         try:

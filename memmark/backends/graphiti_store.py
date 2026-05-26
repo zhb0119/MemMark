@@ -26,6 +26,7 @@ from typing import Any, Dict, List, Optional, Sequence
 from memmark.backends.base import MemoryBackendAdapter
 from memmark.core.context import make_watermark_version, sha256_text, stable_json
 from memmark.core.types import AuditRecord, Candidate, DecisionPoint
+from memmark.llm.config import first_env
 
 try:
     from graphiti_core import Graphiti  # type: ignore
@@ -80,7 +81,7 @@ class GraphitiBackend(MemoryBackendAdapter):
                     base_url=_graphiti_llm_env("BASE_URL"),
                     model=_graphiti_llm_env("MODEL") or "gpt-4.1-mini",
                     small_model=(
-                        _first_env(
+                        first_env(
                             "GRAPHITI_LLM_SMALL_MODEL",
                             "GRAPHITI_OPENAI_SMALL_MODEL",
                         )
@@ -598,16 +599,8 @@ def _normalize_ampm(text: str) -> str:
     )
 
 
-def _first_env(*names: str) -> Optional[str]:
-    for name in names:
-        value = os.getenv(name)
-        if value:
-            return value
-    return None
-
-
 def _graphiti_llm_env(kind: str) -> Optional[str]:
-    return _first_env(
+    return first_env(
         f"GRAPHITI_LLM_{kind}",
         f"GRAPHITI_OPENAI_{kind}",
         f"OPENAI_{kind}",
@@ -628,7 +621,7 @@ def _build_graphiti_instance(*, llm_client: Any, embedder: Any, cross_encoder: A
 
 
 def _build_openai_embedder():
-    model = _first_env(
+    model = first_env(
         "GRAPHITI_EMBEDDING_MODEL",
         "OPENAI_EMBEDDING_MODEL",
         "EMBEDDING_MODEL",
@@ -640,12 +633,12 @@ def _build_openai_embedder():
         return _BatchLimitedEmbedder(OpenAIEmbedder(config=OpenAIEmbedderConfig(embedding_dim=dim)))
     return _BatchLimitedEmbedder(OpenAIEmbedder(
         config=OpenAIEmbedderConfig(
-            api_key=_first_env(
+            api_key=first_env(
                 "GRAPHITI_EMBEDDING_API_KEY",
                 "OPENAI_EMBEDDING_API_KEY",
                 "OPENAI_API_KEY",
             ),
-            base_url=_first_env(
+            base_url=first_env(
                 "GRAPHITI_EMBEDDING_BASE_URL",
                 "OPENAI_EMBEDDING_BASE_URL",
                 "OPENAI_BASE_URL",
@@ -692,7 +685,7 @@ class _BatchLimitedEmbedder(EmbedderClient):  # type: ignore[misc, valid-type]
 
 
 def _embedding_dim() -> Optional[int]:
-    raw = _first_env("GRAPHITI_EMBEDDING_DIM", "OPENAI_EMBEDDING_DIM", "EMBEDDING_DIM")
+    raw = first_env("GRAPHITI_EMBEDDING_DIM", "OPENAI_EMBEDDING_DIM", "EMBEDDING_DIM")
     if not raw:
         return None
     try:
@@ -702,7 +695,7 @@ def _embedding_dim() -> Optional[int]:
 
 
 def _embedding_batch_size() -> int:
-    raw = _first_env("GRAPHITI_EMBEDDING_BATCH_SIZE", "OPENAI_EMBEDDING_BATCH_SIZE", "EMBEDDING_BATCH_SIZE")
+    raw = first_env("GRAPHITI_EMBEDDING_BATCH_SIZE", "OPENAI_EMBEDDING_BATCH_SIZE", "EMBEDDING_BATCH_SIZE")
     if not raw:
         return 10
     try:
@@ -712,7 +705,7 @@ def _embedding_batch_size() -> int:
 
 
 def _kgmark_strength() -> float:
-    raw = _first_env("KGMARK_GRAPHITI_STRENGTH", "KGMARK_STRENGTH")
+    raw = first_env("KGMARK_GRAPHITI_STRENGTH", "KGMARK_STRENGTH")
     if not raw:
         return 0.08
     try:
@@ -722,7 +715,7 @@ def _kgmark_strength() -> float:
 
 
 def _kgmark_mask_ratio() -> float:
-    raw = _first_env("KGMARK_GRAPHITI_MASK_RATIO", "KGMARK_MASK_RATIO")
+    raw = first_env("KGMARK_GRAPHITI_MASK_RATIO", "KGMARK_MASK_RATIO")
     if not raw:
         return 0.08
     try:
@@ -816,21 +809,21 @@ def _env_bool(name: str, default: bool = False) -> bool:
 def _build_openai_reranker():
     return OpenAIRerankerClient(
         config=LLMConfig(
-            api_key=_first_env(
+            api_key=first_env(
                 "GRAPHITI_RERANKER_API_KEY",
                 "GRAPHITI_LLM_API_KEY",
                 "GRAPHITI_OPENAI_API_KEY",
                 "OPENAI_RERANKER_API_KEY",
                 "OPENAI_API_KEY",
             ),
-            base_url=_first_env(
+            base_url=first_env(
                 "GRAPHITI_RERANKER_BASE_URL",
                 "GRAPHITI_LLM_BASE_URL",
                 "GRAPHITI_OPENAI_BASE_URL",
                 "OPENAI_RERANKER_BASE_URL",
                 "OPENAI_BASE_URL",
             ),
-            model=_first_env(
+            model=first_env(
                 "GRAPHITI_RERANKER_MODEL",
                 "GRAPHITI_LLM_SMALL_MODEL",
                 "GRAPHITI_LLM_MODEL",
