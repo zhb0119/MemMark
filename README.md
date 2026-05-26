@@ -1,5 +1,14 @@
 # MemMark
 
+<p align="center">
+  <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white">
+  <img alt="OpenAI-compatible APIs" src="https://img.shields.io/badge/OpenAI--compatible-APIs-412991?logo=openai&logoColor=white">
+  <img alt="Neo4j" src="https://img.shields.io/badge/Neo4j-Graph%20Memory-4581C3?logo=neo4j&logoColor=white">
+  <img alt="LoCoMo" src="https://img.shields.io/badge/LoCoMo-Benchmark-0F766E">
+  <img alt="A-MEM" src="https://img.shields.io/badge/A--MEM-Agentic%20Memory-7C3AED">
+  <img alt="Graphiti" src="https://img.shields.io/badge/Graphiti-Temporal%20KG-EA580C">
+</p>
+
 Code release for reproducing the MemMark experiments on LoCoMo with the A-MEM and Graphiti memory backends.
 
 MemMark studies watermarking for agent memory systems: the watermark is embedded at memory-evolution decision points while preserving the native behavior of the underlying memory backend. This repository contains the cleaned reproduction harness used for the LoCoMo experiments, including backend adapters, audit/verification utilities, metric computation, and sanitized launch scripts.
