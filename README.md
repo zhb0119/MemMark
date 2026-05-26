@@ -233,14 +233,17 @@ Use `--output /custom/path.json` to choose a path manually. Use `--save-checkpoi
 
 ## Citation
 
-If you use this code, please cite the MemMark paper. Replace the placeholder below with the final BibTeX entry after publication:
+If you use this code, please cite:
 
 ```bibtex
-@misc{memmark,
-  title  = {MemMark: Watermarking Agent Memory Systems},
-  author = {Anonymous},
-  year   = {2026},
-  note   = {Code release}
+@misc{zhang2026memmarkstateevolutionattributionwatermarking,
+      title={MemMark: State-Evolution Attribution Watermarking for Agent Long-Term Memory Systems}, 
+      author={Haobo Zhang and Xutao Mao and Guangyuan Dong and Ziwei Li and Xuanbo Su and Kaijie Chen and Jing Yang and Zheng Lin},
+      year={2026},
+      eprint={2605.25002},
+      archivePrefix={arXiv},
+      primaryClass={cs.CR},
+      url={https://arxiv.org/abs/2605.25002}, 
 }
 ```
 
