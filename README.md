@@ -254,22 +254,6 @@ Use `--output /custom/path.json` to choose a path manually. Use `--save-checkpoi
 - Graphiti runs can be substantially slower and depend on Neo4j state; clear or isolate the graph between independent experiments if needed.
 - Do not commit `.env`, `results/`, local model directories, or virtual environments.
 
-## Citation
-
-If you use this code, please cite:
-
-```bibtex
-@misc{zhang2026memmarkstateevolutionattributionwatermarking,
-      title={MemMark: State-Evolution Attribution Watermarking for Agent Long-Term Memory Systems}, 
-      author={Haobo Zhang and Xutao Mao and Guangyuan Dong and Ziwei Li and Xuanbo Su and Kaijie Chen and Jing Yang and Zheng Lin},
-      year={2026},
-      eprint={2605.25002},
-      archivePrefix={arXiv},
-      primaryClass={cs.CR},
-      url={https://arxiv.org/abs/2605.25002}, 
-}
-```
-
 ## License
 
 This repository is released under the MIT License. Third-party systems such as A-MEM, Graphiti, and LoCoMo are governed by their own licenses.
