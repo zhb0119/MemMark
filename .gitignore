@@ -1,0 +1,13 @@
+.env
+.venv/
+*.log
+*.partial
+results/
+output/
+.cache/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+.DS_Store

@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "memmark"
+version = "0.1.0"
+description = "MemMark reproduction harness for A-MEM/Graphiti on LoCoMo"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [{name = "MemMark"}]
+dependencies = [
+  "numpy>=1.24",
+  "openai>=1.0.0",
+  "tqdm>=4.66",
+  "pydantic>=2",
+  "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+amem = [
+  "rank-bm25>=0.2,<0.3",
+  "torch>=2.0,<2.4",
+  "sentence-transformers>=2.2.2,<3.0.0",
+  "transformers>=4.30.0,<5.0.0",
+  "huggingface-hub>=0.15.1,<1.0",
+  "scikit-learn>=1.0,<2.0",
+  "nltk>=3.8,<4.0",
+  "litellm>=1.0,<2.0",
+  "chromadb>=0.4.24,<0.6.0",
+]
+graphiti = [
+  "graphiti-core",
+  "neo4j>=5",
+]
+dev = ["pytest", "ruff"]
+
+[tool.setuptools.packages.find]
+include = ["memmark*"]
+exclude = ["results*", "scripts*", "tools*"]

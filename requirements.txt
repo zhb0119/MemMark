@@ -1,0 +1,24 @@
+# Core MemMark + LoCoMo runner
+numpy>=1.24
+openai>=1.0,<2.0
+tqdm>=4.66
+pydantic>=2
+python-dotenv>=1.0
+
+# A-MEM backend dependencies. Install the eval-repo package with the Python
+# interpreter of the environment you will run experiments in, e.g.:
+#   /path/to/.venv/bin/python tools/install_amem_eval/install.py
+rank-bm25>=0.2,<0.3
+torch>=2.0,<2.4
+sentence-transformers>=2.2.2,<3.0.0
+transformers>=4.30.0,<5.0.0
+huggingface-hub>=0.15.1,<1.0
+scikit-learn>=1.0,<2.0
+nltk>=3.8,<4.0
+litellm>=1.0,<2.0
+chromadb>=0.4.24,<0.6.0
+
+# Graphiti backend dependencies. If graphiti-core pip release is not compatible
+# with your target commit, clone https://github.com/getzep/graphiti and pip install -e .
+graphiti-core
+neo4j>=5
