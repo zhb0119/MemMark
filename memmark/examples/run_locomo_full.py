@@ -112,9 +112,10 @@ def build_parser() -> argparse.ArgumentParser:
         help=(
             "stub = no LLM (zero API cost; only viable with the JsonStore "
             "backend for plumbing checks). "
-            "real = configure an OpenAI-compatible client; backends use it "
-            "for their own internal evolution and we use it for fact "
-            "extraction + QA. Required for paper numbers."
+            "real = configure the MemMark/QA OpenAI-compatible client for "
+            "fact extraction + QA. Backend-internal LLMs are configured "
+            "separately with AMEM_LLM_* / GRAPHITI_LLM_*. Required for "
+            "paper numbers."
         ),
     )
     parser.add_argument("--progress", action="store_true")
@@ -243,7 +244,6 @@ def _result_model_name() -> str:
         os.getenv("RESULT_MODEL_NAME")
         or os.getenv("TARGET_LLM_MODEL")
         or os.getenv("MEMMARK_MODEL")
-        or os.getenv("OPENAI_MODEL")
         or "model"
     )
 
@@ -284,9 +284,8 @@ def _build_qa_layer(mode: str):
 
       * QA responder    — answers LoCoMo questions from the rendered
                           memory context (LoCoMo official prompt).
-      * fact_extractor  — runs ``CONVERSATION2FACTS_PROMPT`` for the
-                          ``fact``-mode ingestion path (A-MEM /
-                          Mem0 protocol).
+      * fact_extractor  — runs ``CONVERSATION2FACTS_PROMPT`` for any
+                          fact-mode ingestion path.
 
     QA judge is the LoCoMo official F1≥0.5 / cat-5 abstention rule;
     not an LLM-judge.
@@ -298,9 +297,9 @@ def _build_qa_layer(mode: str):
     from memmark.llm import OpenAIChatClient
 
     llm_client = OpenAIChatClient(
-        api_key=os.getenv("TARGET_LLM_API_KEY") or os.getenv("MEMMARK_API_KEY") or os.getenv("OPENAI_API_KEY"),
-        base_url=os.getenv("TARGET_LLM_BASE") or os.getenv("MEMMARK_BASE_URL") or os.getenv("OPENAI_BASE_URL"),
-        model=os.getenv("TARGET_LLM_MODEL") or os.getenv("MEMMARK_MODEL") or os.getenv("OPENAI_MODEL"),
+        api_key=os.getenv("TARGET_LLM_API_KEY") or os.getenv("MEMMARK_API_KEY"),
+        base_url=os.getenv("TARGET_LLM_BASE") or os.getenv("MEMMARK_BASE_URL"),
+        model=os.getenv("TARGET_LLM_MODEL") or os.getenv("MEMMARK_MODEL"),
     )
     qa_responder = make_locomo_qa_responder(llm_client)
     qa_judge = make_locomo_qa_judge()
@@ -313,7 +312,17 @@ def _build_backend(name: str, amem_model_name: str):
     if name == "amem":
         from memmark.backends import load_amem
 
-        return load_amem(model_name=amem_model_name)
+        return load_amem(
+            model_name=amem_model_name,
+            llm_backend=os.getenv("AMEM_LLM_BACKEND", "openai"),
+            llm_model=(
+                os.getenv("AMEM_LLM_MODEL")
+                or os.getenv("AMEM_OPENAI_MODEL")
+                or "gpt-4o-mini"
+            ),
+            api_key=os.getenv("AMEM_LLM_API_KEY") or os.getenv("AMEM_OPENAI_API_KEY"),
+            api_base=os.getenv("AMEM_LLM_BASE_URL") or os.getenv("AMEM_OPENAI_BASE_URL"),
+        )
     if name == "graphiti":
         from memmark.backends import load_graphiti
 

@@ -73,6 +73,20 @@ set -a; source .env; set +a
 
 The project uses OpenAI-compatible chat and embedding APIs. Keep `.env` private.
 
+## API Configuration
+
+MemMark separates two kinds of model APIs:
+
+- `TARGET_LLM_*` / `MEMMARK_*`: the target API used by MemMark candidate sampling, LoCoMo fact extraction, and QA answering.
+- `AMEM_LLM_*` / `GRAPHITI_LLM_*`: the memory system's own internal API used by A-MEM or Graphiti while they build and evolve memory.
+
+This separation matters because the memory backend is the system under test, while the target/QA model is the evaluator and watermark candidate generator. The launch scripts map the backend-specific variables to `OPENAI_*` only inside that process when the upstream SDK expects OpenAI-compatible environment names.
+
+Upstream defaults checked against the official repositories:
+
+- A-MEM: `AgenticMemorySystem` defaults to `llm_backend="sglang"`, `llm_model="gpt-4o-mini"`, and `model_name="all-MiniLM-L6-v2"` for SentenceTransformer retrieval. The LoCoMo eval examples commonly run the OpenAI backend with `gpt-4o-mini`.
+- Graphiti: current upstream `graphiti_core` creates an OpenAI client by default. In the checked official repo, extraction defaults to `gpt-4.1-mini`, small/reranking calls default to `gpt-4.1-nano`, and embeddings default to `text-embedding-3-small`. Older Graphiti configs may have used `gpt-4o-mini`, so set `GRAPHITI_LLM_MODEL=gpt-4o-mini` if you need that exact setup.
+
 ## Data
 
 Download LoCoMo separately from the official repository:
@@ -219,7 +233,7 @@ results/graphiti/deepseek-v4-pro/20260526-123456/conv0_kgmark_graphiti.json
 results/json/model/20260526-123456/conv0_watermark+no_watermark.json
 ```
 
-`model_name` is resolved from `RESULT_MODEL_NAME`, `TARGET_LLM_MODEL`, `MEMMARK_MODEL`, or `OPENAI_MODEL`. `time` is `RUN_TAG` / `MEMMARK_RUN_TAG` if set, otherwise the current timestamp (`YYYYmmdd-HHMMSS`).
+`model_name` is resolved from `RESULT_MODEL_NAME`, `TARGET_LLM_MODEL`, or `MEMMARK_MODEL`. It intentionally names the MemMark/QA target model, not the backend's private internal model. `time` is `RUN_TAG` / `MEMMARK_RUN_TAG` if set, otherwise the current timestamp (`YYYYmmdd-HHMMSS`).
 
 The JSON contains:
 
@@ -235,7 +249,7 @@ Use `--output /custom/path.json` to choose a path manually. Use `--save-checkpoi
 ## Reproducibility Notes
 
 - Fix `MEMMARK_KEY` for comparable watermark verification across runs.
-- Keep backend and target LLM settings stable within a reported experiment.
+- Report both backend-internal LLM settings and target/QA LLM settings.
 - A-MEM runs can be slow because each turn may trigger memory evolution through the backend's native LLM path.
 - Graphiti runs can be substantially slower and depend on Neo4j state; clear or isolate the graph between independent experiments if needed.
 - Do not commit `.env`, `results/`, local model directories, or virtual environments.

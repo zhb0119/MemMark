@@ -67,6 +67,7 @@ class AMemBackend(MemoryBackendAdapter):
         llm_model: str = "gpt-4o-mini",
         evo_threshold: int = 100,
         api_key: Optional[str] = None,
+        api_base: Optional[str] = None,
         system: Optional[Any] = None,
     ) -> None:
         _ensure_hf_download_compat()
@@ -84,6 +85,7 @@ class AMemBackend(MemoryBackendAdapter):
                 llm_model=llm_model,
                 evo_threshold=evo_threshold,
                 api_key=api_key,
+                api_base=api_base,
             )
         self._evidence: Dict[str, Dict[str, Any]] = {}
 

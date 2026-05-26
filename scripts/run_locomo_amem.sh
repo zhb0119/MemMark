@@ -17,8 +17,6 @@ resolve_model_name() {
     printf '%s' "$TARGET_LLM_MODEL"
   elif [[ -n "${MEMMARK_MODEL:-}" ]]; then
     printf '%s' "$MEMMARK_MODEL"
-  elif [[ -n "${OPENAI_MODEL:-}" ]]; then
-    printf '%s' "$OPENAI_MODEL"
   else
     printf '%s' "model"
   fi
@@ -61,18 +59,22 @@ mkdir -p "$(dirname "$OUTPUT_FILE")"
 
 echo "Output: $OUTPUT_FILE"
 
-# A-MEM uses OPENAI_* internally. Keep this mapping local to the A-MEM script
-# so the same .env can also carry Graphiti's internal OpenAI-compatible config.
-export OPENAI_BASE_URL="${AMEM_OPENAI_BASE_URL:-${TARGET_LLM_BASE:-${MEMMARK_BASE_URL:-}}}"
-export OPENAI_API_KEY="${AMEM_OPENAI_API_KEY:-${TARGET_LLM_API_KEY:-${MEMMARK_API_KEY:-}}}"
-export OPENAI_MODEL="${AMEM_OPENAI_MODEL:-${TARGET_LLM_MODEL:-${MEMMARK_MODEL:-}}}"
-if [[ -n "${AMEM_OPENAI_EXTRA_BODY:-}" ]]; then
-  export OPENAI_EXTRA_BODY="$AMEM_OPENAI_EXTRA_BODY"
+# A-MEM's internal memory-evolution LLM is separate from the MemMark/QA
+# target model. Legacy AMEM_OPENAI_* variables are still accepted.
+export OPENAI_BASE_URL="${AMEM_LLM_BASE_URL:-${AMEM_OPENAI_BASE_URL:-${OPENAI_BASE_URL:-}}}"
+export OPENAI_API_KEY="${AMEM_LLM_API_KEY:-${AMEM_OPENAI_API_KEY:-${OPENAI_API_KEY:-}}}"
+export OPENAI_MODEL="${AMEM_LLM_MODEL:-${AMEM_OPENAI_MODEL:-${OPENAI_MODEL:-gpt-4o-mini}}}"
+export AMEM_LLM_BACKEND="${AMEM_LLM_BACKEND:-openai}"
+export AMEM_LLM_BASE_URL="${AMEM_LLM_BASE_URL:-$OPENAI_BASE_URL}"
+export AMEM_LLM_API_KEY="${AMEM_LLM_API_KEY:-$OPENAI_API_KEY}"
+export AMEM_LLM_MODEL="${AMEM_LLM_MODEL:-$OPENAI_MODEL}"
+if [[ -n "${AMEM_LLM_EXTRA_BODY:-${AMEM_OPENAI_EXTRA_BODY:-}}" ]]; then
+  export OPENAI_EXTRA_BODY="${AMEM_LLM_EXTRA_BODY:-$AMEM_OPENAI_EXTRA_BODY}"
 fi
 
-export MEMMARK_BASE_URL="${MEMMARK_BASE_URL:-${TARGET_LLM_BASE:-$OPENAI_BASE_URL}}"
-export MEMMARK_API_KEY="${MEMMARK_API_KEY:-${TARGET_LLM_API_KEY:-$OPENAI_API_KEY}}"
-export MEMMARK_MODEL="${MEMMARK_MODEL:-${TARGET_LLM_MODEL:-$OPENAI_MODEL}}"
+export MEMMARK_BASE_URL="${MEMMARK_BASE_URL:-${TARGET_LLM_BASE:-}}"
+export MEMMARK_API_KEY="${MEMMARK_API_KEY:-${TARGET_LLM_API_KEY:-}}"
+export MEMMARK_MODEL="${MEMMARK_MODEL:-${TARGET_LLM_MODEL:-}}"
 export TARGET_LLM_BASE="${TARGET_LLM_BASE:-$MEMMARK_BASE_URL}"
 export TARGET_LLM_API_KEY="${TARGET_LLM_API_KEY:-$MEMMARK_API_KEY}"
 export TARGET_LLM_MODEL="${TARGET_LLM_MODEL:-$MEMMARK_MODEL}"

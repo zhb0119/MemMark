@@ -76,10 +76,17 @@ class GraphitiBackend(MemoryBackendAdapter):
                 )
             llm_client = OpenAIClient(
                 config=LLMConfig(
-                    api_key=os.getenv("OPENAI_API_KEY") or os.getenv("MEMMARK_API_KEY"),
-                    base_url=os.getenv("OPENAI_BASE_URL") or os.getenv("MEMMARK_BASE_URL"),
-                    model=os.getenv("OPENAI_MODEL") or os.getenv("MEMMARK_MODEL"),
-                    small_model=os.getenv("OPENAI_MODEL") or os.getenv("MEMMARK_MODEL"),
+                    api_key=_graphiti_llm_env("API_KEY"),
+                    base_url=_graphiti_llm_env("BASE_URL"),
+                    model=_graphiti_llm_env("MODEL") or "gpt-4.1-mini",
+                    small_model=(
+                        _first_env(
+                            "GRAPHITI_LLM_SMALL_MODEL",
+                            "GRAPHITI_OPENAI_SMALL_MODEL",
+                        )
+                        or _graphiti_llm_env("MODEL")
+                        or "gpt-4.1-nano"
+                    ),
                 )
             )
             embedder = _build_openai_embedder()
@@ -320,7 +327,11 @@ class GraphitiBackend(MemoryBackendAdapter):
             nonce=keyed,
             watermark_version=make_watermark_version(
                 sdk_version="kgmark-graphiti-v0.2",
-                model=os.getenv("GRAPHITI_EMBEDDING_MODEL") or os.getenv("OPENAI_MODEL") or "graphiti",
+                model=(
+                    os.getenv("GRAPHITI_EMBEDDING_MODEL")
+                    or os.getenv("GRAPHITI_LLM_MODEL")
+                    or "graphiti"
+                ),
                 extra="carrier=episode_local_subgraph_embedding",
             ),
         )
@@ -595,6 +606,14 @@ def _first_env(*names: str) -> Optional[str]:
     return None
 
 
+def _graphiti_llm_env(kind: str) -> Optional[str]:
+    return _first_env(
+        f"GRAPHITI_LLM_{kind}",
+        f"GRAPHITI_OPENAI_{kind}",
+        f"OPENAI_{kind}",
+    )
+
+
 def _build_graphiti_instance(*, llm_client: Any, embedder: Any, cross_encoder: Any) -> Any:
     kwargs = {
         "uri": os.getenv("NEO4J_URI", "bolt://localhost:7687"),
@@ -612,7 +631,6 @@ def _build_openai_embedder():
     model = _first_env(
         "GRAPHITI_EMBEDDING_MODEL",
         "OPENAI_EMBEDDING_MODEL",
-        "MEMMARK_EMBEDDING_MODEL",
         "EMBEDDING_MODEL",
     )
     dim = _embedding_dim()
@@ -625,16 +643,12 @@ def _build_openai_embedder():
             api_key=_first_env(
                 "GRAPHITI_EMBEDDING_API_KEY",
                 "OPENAI_EMBEDDING_API_KEY",
-                "MEMMARK_EMBEDDING_API_KEY",
                 "OPENAI_API_KEY",
-                "MEMMARK_API_KEY",
             ),
             base_url=_first_env(
                 "GRAPHITI_EMBEDDING_BASE_URL",
                 "OPENAI_EMBEDDING_BASE_URL",
-                "MEMMARK_EMBEDDING_BASE_URL",
                 "OPENAI_BASE_URL",
-                "MEMMARK_BASE_URL",
             ),
             embedding_model=model,
             embedding_dim=dim or 1536,
@@ -804,21 +818,26 @@ def _build_openai_reranker():
         config=LLMConfig(
             api_key=_first_env(
                 "GRAPHITI_RERANKER_API_KEY",
+                "GRAPHITI_LLM_API_KEY",
+                "GRAPHITI_OPENAI_API_KEY",
                 "OPENAI_RERANKER_API_KEY",
                 "OPENAI_API_KEY",
-                "MEMMARK_API_KEY",
             ),
             base_url=_first_env(
                 "GRAPHITI_RERANKER_BASE_URL",
+                "GRAPHITI_LLM_BASE_URL",
+                "GRAPHITI_OPENAI_BASE_URL",
                 "OPENAI_RERANKER_BASE_URL",
                 "OPENAI_BASE_URL",
-                "MEMMARK_BASE_URL",
             ),
             model=_first_env(
                 "GRAPHITI_RERANKER_MODEL",
+                "GRAPHITI_LLM_SMALL_MODEL",
+                "GRAPHITI_LLM_MODEL",
+                "GRAPHITI_OPENAI_SMALL_MODEL",
+                "GRAPHITI_OPENAI_MODEL",
                 "OPENAI_RERANKER_MODEL",
                 "OPENAI_MODEL",
-                "MEMMARK_MODEL",
             ),
         )
     )
