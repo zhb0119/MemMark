@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href="https://arxiv.org/abs/2605.25002"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2605.25002-b31b1b.svg"></a>
-  <a href="https://zhb0119.github.io/MemMark/"><img alt="Project Page" src="https://img.shields.io/badge/Project-Page-4F46E5.svg"></a>
+  <a href="https://henrymao2004.github.io/MemMark/"><img alt="Project Page" src="https://img.shields.io/badge/Project-Page-4F46E5.svg"></a>
   <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white">
   <img alt="OpenAI-compatible APIs" src="https://img.shields.io/badge/OpenAI--compatible-APIs-412991?logo=openai&logoColor=white">
   <img alt="Neo4j" src="https://img.shields.io/badge/Neo4j-Graph%20Memory-4581C3?logo=neo4j&logoColor=white">
@@ -15,13 +15,11 @@ Code release for reproducing the MemMark experiments on LoCoMo with the A-MEM an
 
 MemMark studies watermarking for agent memory systems: the watermark is embedded at memory-evolution decision points while preserving the native behavior of the underlying memory backend. This repository contains the cleaned reproduction harness used for the LoCoMo experiments, including backend adapters, audit/verification utilities, metric computation, and sanitized launch scripts.
 
-> This repository intentionally does not include experiment outputs, API keys, local model caches, or LoCoMo data files.
-
 ## What Is Included
 
 ```text
 memmark/
-  backends/              # Json, A-MEM, and Graphiti adapters
+  backends/              # A-MEM and Graphiti adapters
   benchmarks/locomo/     # LoCoMo loader, driver, QA prompts, metrics
   core/                  # sampler, commitments, Merkle audit log
   experiments/           # RQ1-RQ5 metric helpers
@@ -30,7 +28,6 @@ memmark/
   verifier/              # full/partial/in-record verification utilities
   examples/run_locomo_full.py
 scripts/
-  run_locomo_smoke.sh
   run_locomo_amem.sh
   run_locomo_graphiti.sh
 tools/install_amem_eval/ # installer for the A-MEM eval-repo package
@@ -38,7 +35,6 @@ tools/install_amem_eval/ # installer for the A-MEM eval-repo package
 
 ## Supported Backends
 
-- **JsonMemoryStore**: lightweight smoke-test backend with no external services.
 - **A-MEM**: agentic-note memory backend, installed from the A-MEM evaluation repository to match the LoCoMo protocol.
 - **Graphiti**: temporal knowledge-graph memory backend, backed by Neo4j.
 
@@ -99,28 +95,6 @@ export MEMMARK_LOCOMO_PATH=$(realpath ../locomo/data/locomo10.json)
 ```
 
 The data file is not vendored in this repository.
-
-## Quick Smoke Test
-
-The JSON backend with stub LLM mode checks the package, data loader, driver, and metric pipeline without API calls:
-
-```bash
-bash scripts/run_locomo_smoke.sh 0
-```
-
-For a direct Python invocation:
-
-```bash
-python -m memmark.examples.run_locomo_full \
-  --locomo "$MEMMARK_LOCOMO_PATH" \
-  --conversation 0 \
-  --backend json \
-  --llm-mode stub \
-  --max-sessions 2 \
-  --max-qa 5 \
-  --baselines watermark no_watermark \
-  --output-mode metrics
-```
 
 ## Reproducing A-MEM Runs
 
@@ -211,10 +185,10 @@ python -m memmark.examples.run_locomo_full \
 
 Important options:
 
-- `--backend {json,amem,graphiti}` selects the memory backend.
+- `--backend {amem,graphiti}` selects the memory backend.
 - `--baselines ...` selects one or more baselines.
 - `--max-sessions` and `--max-qa` control run size.
-- `--llm-mode stub` is for smoke tests; `--llm-mode real` is required for paper-style runs.
+- `--llm-mode stub` disables target-side fact extraction and QA calls for debugging; `--llm-mode real` is required for paper-style runs.
 - `--output-mode metrics` writes compact metric JSON; `full` also includes detailed traces.
 - `--output PATH` overrides the default output path.
 - `--save-checkpoints` enables legacy recovery files (`.partial` and per-baseline JSON); by default the runner writes only one clean output JSON.
@@ -232,7 +206,6 @@ Examples:
 ```text
 results/amem/deepseek-v4-pro/20260526-123456/conv0_watermark.json
 results/graphiti/deepseek-v4-pro/20260526-123456/conv0_kgmark_graphiti.json
-results/json/model/20260526-123456/conv0_watermark+no_watermark.json
 ```
 
 `model_name` is resolved from `RESULT_MODEL_NAME`, `TARGET_LLM_MODEL`, or `MEMMARK_MODEL`. It intentionally names the MemMark/QA target model, not the backend's private internal model. `time` is `RUN_TAG` / `MEMMARK_RUN_TAG` if set, otherwise the current timestamp (`YYYYmmdd-HHMMSS`).

@@ -101,9 +101,8 @@ class MemoryWatermarker:
             watermark_version=self.watermark_version,
             target_k=target_k,
         )
-        # Inject the sampler into the backend's SDK. Backends without
-        # an internal LLM (JsonStore) implement ``attach_sampler`` as a
-        # no-op so this is safe even for the smoke baseline.
+        # Inject the sampler into the backend's SDK. Adapters without
+        # an internal LLM inherit a no-op ``attach_sampler`` method.
         if hasattr(backend, "attach_sampler"):
             backend.attach_sampler(self.sampler)
 

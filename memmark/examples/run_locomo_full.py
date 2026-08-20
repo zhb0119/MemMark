@@ -1,14 +1,13 @@
 """End-to-end runner for MemMark on LoCoMo.
 
-Two LLM modes (the diff that turns this from a smoke into a paper run):
+Two target-side LLM modes:
 
-  --llm-mode stub  (default)  — extractor / carrier / QA all rule-based.
-                                Zero API cost; smoke only.
-  --llm-mode real             — LLM抽事实 + LLM 生成/打分候选 + LLM 答 QA.
+  --llm-mode stub             — disables target-side extraction and QA calls.
+  --llm-mode real  (default)  — LLM抽事实 + LLM 生成/打分候选 + LLM 答 QA.
                                 这是"图里那 9 步"真实路径,跑 paper 用这个.
 
 Backends:
-  --backend json|amem|graphiti
+  --backend amem|graphiti
 
 Example (paper-quality 1 cell):
 
@@ -31,7 +30,6 @@ from dataclasses import asdict, is_dataclass
 from pathlib import Path
 from typing import Any, Dict, Optional  # noqa: F401
 
-from memmark.backends import JsonMemoryStore
 from memmark.baselines import build_baseline
 from memmark.benchmarks.locomo import LoCoMoDriver, load_locomo
 from memmark.benchmarks.locomo.qa_eval import (
@@ -54,7 +52,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--max-sessions",
         type=int,
         default=2,
-        help="Cap sessions to keep smoke fast. Pass a large value (e.g. 999) for full LoCoMo.",
+        help="Cap sessions for short runs. Pass a large value (e.g. 999) for full LoCoMo.",
     )
     parser.add_argument(
         "--max-qa",
@@ -64,8 +62,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--backend",
-        choices=("json", "amem", "graphiti"),
-        default="json",
+        choices=("amem", "graphiti"),
+        default="amem",
     )
     parser.add_argument(
         "--baselines",
@@ -108,10 +106,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--llm-mode",
         choices=("stub", "real"),
-        default="stub",
+        default="real",
         help=(
-            "stub = no LLM (zero API cost; only viable with the JsonStore "
-            "backend for plumbing checks). "
+            "stub = disable target-side fact extraction and QA calls for debugging. "
             "real = configure the MemMark/QA OpenAI-compatible client for "
             "fact extraction + QA. Backend-internal LLMs are configured "
             "separately with AMEM_LLM_* / GRAPHITI_LLM_*. Required for "
@@ -307,8 +304,6 @@ def _build_qa_layer(mode: str):
 
 
 def _build_backend(name: str, amem_model_name: str):
-    if name == "json":
-        return JsonMemoryStore()
     if name == "amem":
         from memmark.backends import load_amem
 

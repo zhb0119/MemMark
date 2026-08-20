@@ -394,8 +394,7 @@ def make_locomo_qa_responder(
 
       * A-mem: ``find_related_memories(q, k)`` formatted string.
       * Graphiti: ``client.search(q, group_ids).fact`` list.
-      * JsonStore / fallback: full snapshot in LoCoMo session-marker
-        format.
+      * Adapter fallback: full snapshot in LoCoMo session-marker format.
 
     Backends that produce an answer themselves (mode=``answer``)
     bypass this responder entirely.

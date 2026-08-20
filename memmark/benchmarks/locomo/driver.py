@@ -6,7 +6,6 @@ its upstream LoCoMo / LongMemEval official protocol):
   - "turn"    : per-turn episode with session date_time
                 Graphiti  (graphiti/tests/evals/eval_e2e_graph_building.py)
                 A-MEM     (A-mem/test_advanced_robust.py)
-                JsonStore (smoke default)
   - "fact"    : LoCoMo-official `CONVERSATION2FACTS_PROMPT` per
                 session → N facts each with dia_id evidence
                 (kept for Mem0-style ablations only)
@@ -530,7 +529,7 @@ class LoCoMoDriver:
         result: "LoCoMoDriverResult",
         recent_dialog_ids: List[str],
     ) -> None:
-        """Per-turn ingestion (Graphiti / JsonStore default).
+        """Per-turn ingestion (Graphiti default).
 
         Each LoCoMo turn becomes one memory event; the operation
         carries the session's date_time so Graphiti uses it as

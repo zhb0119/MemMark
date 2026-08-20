@@ -29,7 +29,7 @@ class MemoryBackendAdapter(ABC):
         client with the watermark sampler. Backends that drive their
         own evolution via LLM (A-MEM, Graphiti) override this
         to install :class:`memmark.llm.watermarked.WatermarkedSampler`
-        at the SDK's LLM-call boundary. JsonStore is a no-op.
+        at the SDK's LLM-call boundary.
     """
 
     # Driver fallback when a backend doesn't override.

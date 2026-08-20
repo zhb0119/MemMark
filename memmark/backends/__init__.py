@@ -9,9 +9,8 @@ Optional backends gate their imports on dependency availability.
 """
 
 from memmark.backends.base import MemoryBackendAdapter
-from memmark.backends.json_store import JsonMemoryStore
 
-__all__ = ["MemoryBackendAdapter", "JsonMemoryStore"]
+__all__ = ["MemoryBackendAdapter"]
 
 
 def load_amem(**kwargs):
