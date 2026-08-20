@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>MemMark — State-Evolution Attribution Watermarking</title>
+  <meta name="title" content="MemMark — State-Evolution Attribution Watermarking">
+  <meta name="description" content="MemMark embeds robust attribution signals into utility-preserving memory-evolution decisions for long-term agents.">
+  <meta name="keywords" content="MemMark, agent memory, watermarking, provenance, long-term memory, A-MEM, Graphiti, LoCoMo">
+  <meta name="author" content="Haobo Zhang, Xutao Mao, Guangyuan Dong, Ziwei Li, Xuanbo Su, Kaijie Chen, Jing Yang, Zheng Lin">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://zhb0119.github.io/MemMark/">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="MemMark Project Page">
+  <meta property="og:title" content="MemMark: State-Evolution Attribution Watermarking for Agent Long-Term Memory Systems">
+  <meta property="og:description" content="Attribution that survives when only the final agent-memory snapshot remains.">
+  <meta property="og:url" content="https://zhb0119.github.io/MemMark/">
+  <meta property="og:image" content="https://zhb0119.github.io/MemMark/static/images/pipeline.png">
+  <meta property="article:published_time" content="2026-05-26T00:00:00Z">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="MemMark: Watermarking the Memory-Evolution Channel">
+  <meta name="twitter:description" content="Attribution that survives when only the final agent-memory snapshot remains.">
+  <meta name="twitter:image" content="https://zhb0119.github.io/MemMark/static/images/pipeline.png">
+
+  <meta name="citation_title" content="MemMark: State-Evolution Attribution Watermarking for Agent Long-Term Memory Systems">
+  <meta name="citation_author" content="Zhang, Haobo">
+  <meta name="citation_author" content="Mao, Xutao">
+  <meta name="citation_author" content="Dong, Guangyuan">
+  <meta name="citation_author" content="Li, Ziwei">
+  <meta name="citation_author" content="Su, Xuanbo">
+  <meta name="citation_author" content="Chen, Kaijie">
+  <meta name="citation_author" content="Yang, Jing">
+  <meta name="citation_author" content="Lin, Zheng">
+  <meta name="citation_publication_date" content="2026/05/26">
+  <meta name="citation_arxiv_id" content="2605.25002">
+  <meta name="citation_pdf_url" content="https://zhb0119.github.io/MemMark/static/pdfs/memmark.pdf">
+
+  <meta name="theme-color" content="#111936">
+  <link rel="icon" type="image/svg+xml" href="static/images/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/index.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "MemMark: State-Evolution Attribution Watermarking for Agent Long-Term Memory Systems",
+    "description": "A state-evolution attribution watermark for long-term agent memory systems.",
+    "author": [
+      {"@type": "Person", "name": "Haobo Zhang"},
+      {"@type": "Person", "name": "Xutao Mao"},
+      {"@type": "Person", "name": "Guangyuan Dong"},
+      {"@type": "Person", "name": "Ziwei Li"},
+      {"@type": "Person", "name": "Xuanbo Su"},
+      {"@type": "Person", "name": "Kaijie Chen"},
+      {"@type": "Person", "name": "Jing Yang"},
+      {"@type": "Person", "name": "Zheng Lin"}
+    ],
+    "datePublished": "2026-05-26",
+    "url": "https://zhb0119.github.io/MemMark/",
+    "sameAs": "https://arxiv.org/abs/2605.25002",
+    "image": "https://zhb0119.github.io/MemMark/static/images/pipeline.png",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <header class="site-header">
+    <nav class="nav-shell" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="MemMark home">
+        <span class="brand-mark">MM</span>
+        <span>MemMark</span>
+      </a>
+      <div class="nav-links">
+        <a href="#method">Method</a>
+        <a href="#results">Results</a>
+        <a href="#citation">Citation</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <section class="hero" id="top">
+      <div class="hero-glow hero-glow-one"></div>
+      <div class="hero-glow hero-glow-two"></div>
+      <div class="hero-content">
+        <p class="eyebrow">STATE-EVOLUTION ATTRIBUTION</p>
+        <h1><span>MemMark:</span> Watermarking<br>the Memory-Evolution Channel</h1>
+        <p class="hero-subtitle">Attribution for long-term agent memory that survives when logs, visible outputs, and trusted metadata do not.</p>
+
+        <div class="authors" aria-label="Paper authors">
+          <span>Haobo Zhang<sup>1,*</sup></span>
+          <span>Xutao Mao<sup>2,*</sup></span>
+          <span>Guangyuan Dong<sup>3</sup></span>
+          <span>Ziwei Li<sup>4</sup></span>
+          <span>Xuanbo Su<sup>5</sup></span>
+          <span>Kaijie Chen<sup>6</sup></span>
+          <span>Jing Yang<sup>7</sup></span>
+          <span>Zheng Lin<sup>8,†</sup></span>
+        </div>
+        <p class="affiliations">
+          <sup>1</sup>Zhejiang University of Technology · <sup>2</sup>Independent Researcher · <sup>3</sup>National University of Singapore ·
+          <sup>4</sup>KAUST · <sup>5</sup>Bairong · <sup>6</sup>Tongji University · <sup>7</sup>Universiti Malaya · <sup>8</sup>University of Hong Kong
+        </p>
+        <p class="author-note"><sup>*</sup>Equal contribution &nbsp; <sup>†</sup>Corresponding author &nbsp; · &nbsp; arXiv 2026</p>
+
+        <div class="hero-actions">
+          <a class="button button-primary" href="static/pdfs/memmark.pdf" target="_blank" rel="noopener">
+            <span aria-hidden="true">↓</span> Paper PDF
+          </a>
+          <a class="button" href="https://arxiv.org/abs/2605.25002" target="_blank" rel="noopener">arXiv</a>
+          <a class="button" href="https://github.com/zhb0119/MemMark" target="_blank" rel="noopener">GitHub</a>
+          <a class="button" href="#citation">Cite</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="pipeline-section" aria-labelledby="pipeline-title">
+      <div class="content-shell wide-shell">
+        <figure class="paper-figure pipeline-figure">
+          <img src="static/images/pipeline.png" alt="MemMark pipeline showing memory-evolution carriers, keyed sampling, audit evidence, and three verification regimes" fetchpriority="high">
+          <figcaption id="pipeline-title">MemMark intercepts only the selection layer, leaving each backend's native commit path unchanged.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="metric-band" aria-label="Headline results">
+      <div class="content-shell metrics-grid">
+        <article class="metric-card">
+          <strong>99.6<span>%</span></strong>
+          <p>unwatermarked Overall F1 retained</p>
+        </article>
+        <article class="metric-card">
+          <strong>40<span>/40</span></strong>
+          <p>payload bits recovered from snapshots</p>
+        </article>
+        <article class="metric-card">
+          <strong>1.26<span> bits</span></strong>
+          <p>highest mean carrier entropy</p>
+        </article>
+        <article class="metric-card">
+          <strong>9</strong>
+          <p>memory-lifecycle attacks evaluated</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-block" id="abstract">
+      <div class="content-shell text-shell">
+        <p class="section-kicker">OVERVIEW</p>
+        <h2>Provenance inside the state transition</h2>
+        <p class="lead-copy">
+          MemMark addresses provenance for long-term agent memories when external logs and trusted metadata no longer survive. It embeds an owner-controlled signal into utility-preserving memory-write choices: update targets, links, and equivalent semantic realizations. A secret-keyed sampler preserves the backend preference distribution, while commitments, Merkle logs, signed anchors, and in-record reveal data make those decisions replayable. Across A-MEM and Graphiti on LoCoMo, the method preserves memory utility and supports full payload recovery from final snapshots.
+        </p>
+      </div>
+    </section>
+
+    <section class="section-block section-tinted" id="method">
+      <div class="content-shell">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">METHOD</p>
+            <h2>One abstraction, three carriers</h2>
+          </div>
+          <p>The watermark occupies natural decision freedom already present in long-term memory backends.</p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card feature-green">
+            <span class="feature-index">01</span>
+            <h3>Update target</h3>
+            <p>Select which compatible memory record receives new evidence while preserving the meaning of the write.</p>
+          </article>
+          <article class="feature-card feature-blue">
+            <span class="feature-index">02</span>
+            <h3>Link target</h3>
+            <p>Choose among equivalent prior objects that can be connected to the same new evidence.</p>
+          </article>
+          <article class="feature-card feature-coral">
+            <span class="feature-index">03</span>
+            <h3>Semantic realization</h3>
+            <p>Encode the same fact through one of several semantically equivalent surface forms.</p>
+          </article>
+        </div>
+
+        <div class="method-steps" aria-label="MemMark method stages">
+          <div><span>1</span><p><b>Enumerate</b> admissible, scored candidates at the LLM-call boundary.</p></div>
+          <div><span>2</span><p><b>Select</b> with secret-keyed, distribution-preserving sampling.</p></div>
+          <div><span>3</span><p><b>Bind</b> the decision to commitments, a Merkle root, and reveal evidence.</p></div>
+          <div><span>4</span><p><b>Replay</b> R1 full-log, R2 partial-log, or R3 snapshot-only evidence.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-block" id="results">
+      <div class="content-shell">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">EVIDENCE</p>
+            <h2>Capacity and snapshot verification</h2>
+          </div>
+          <p>Results cover six model–backend configurations across A-MEM and Graphiti.</p>
+        </div>
+
+        <div class="result-grid">
+          <figure class="paper-figure result-figure">
+            <img src="static/images/capacity.png" alt="Entropy distributions and payload allocation for update, link, and semantic carriers" loading="lazy">
+            <figcaption><b>Carrier capacity.</b> Mean entropies are 1.16, 1.14, and 1.26 bits for update, link, and semantic-realization decisions.</figcaption>
+          </figure>
+          <figure class="paper-figure result-figure">
+            <img src="static/images/verification.png" alt="Snapshot-only payload recovery and partial-log recovery curve" loading="lazy">
+            <figcaption><b>Snapshot-only attribution.</b> R3 recovers the full payload; R2 recovery rises smoothly as more evidence is retained.</figcaption>
+          </figure>
+        </div>
+
+        <div class="callout">
+          <span class="callout-label">KEY RESULT</span>
+          <p>MemMark recovers all 40 payload bits from the final snapshot, while signed-metadata-only recovers none and wrong-key verification remains near chance.</p>
+        </div>
+
+        <article class="evidence-block">
+          <div class="evidence-copy">
+            <p class="section-kicker">RQ1</p>
+            <h3>Utility preservation on LoCoMo</h3>
+            <p>Across three LLM backbones and two memory systems, average Overall F1 changes from 0.2816 to 0.2804. Average BLEU-1 changes from 0.3069 to 0.3077.</p>
+          </div>
+          <figure class="paper-figure table-figure">
+            <div class="table-scroll">
+              <img src="static/images/utility-table.png" alt="Main LoCoMo utility results table from the MemMark paper" loading="lazy">
+            </div>
+          </figure>
+        </article>
+
+        <article class="evidence-block evidence-block-reverse">
+          <div class="evidence-copy">
+            <p class="section-kicker">RQ4</p>
+            <h3>Attack-specific diagnostics</h3>
+            <p>Content edits, record removal, and synthesis-style mutations trigger distinct verifier signals. Authenticated surviving records remain useful even when evidence is incomplete.</p>
+          </div>
+          <figure class="paper-figure table-figure">
+            <div class="table-scroll">
+              <img src="static/images/robustness-table.png" alt="Attack-specific recovery and wrong-key separation table from the MemMark paper" loading="lazy">
+            </div>
+          </figure>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-block citation-section" id="citation">
+      <div class="content-shell">
+        <div class="citation-card">
+          <div class="citation-heading">
+            <div>
+              <p class="section-kicker">REFERENCE</p>
+              <h2>Cite MemMark</h2>
+            </div>
+            <button class="copy-button" id="copy-bibtex" type="button" aria-label="Copy BibTeX citation">Copy BibTeX</button>
+          </div>
+          <pre id="bibtex-code"><code>@article{zhang2026memmark,
+  title   = {MemMark: State-Evolution Attribution Watermarking for Agent Long-Term Memory Systems},
+  author  = {Zhang, Haobo and Mao, Xutao and Dong, Guangyuan and Li, Ziwei and Su, Xuanbo and Chen, Kaijie and Yang, Jing and Lin, Zheng},
+  journal = {arXiv preprint arXiv:2605.25002},
+  year    = {2026},
+  doi     = {10.48550/arXiv.2605.25002},
+  url     = {https://arxiv.org/abs/2605.25002}
+}</code></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="content-shell footer-content">
+      <p>MemMark · State-Evolution Attribution Watermarking</p>
+      <p>Built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank" rel="noopener">Academic Project Page Template</a>, adopted from <a href="https://nerfies.github.io" target="_blank" rel="noopener">Nerfies</a>. Website content is available under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="license noopener">CC BY-SA 4.0</a>.</p>
+    </div>
+  </footer>
+
+  <script src="static/js/index.js"></script>
+</body>
+</html>

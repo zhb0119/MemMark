@@ -2,6 +2,7 @@
 
 <p align="center">
   <a href="https://arxiv.org/abs/2605.25002"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2605.25002-b31b1b.svg"></a>
+  <a href="https://zhb0119.github.io/MemMark/"><img alt="Project Page" src="https://img.shields.io/badge/Project-Page-4F46E5.svg"></a>
   <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white">
   <img alt="OpenAI-compatible APIs" src="https://img.shields.io/badge/OpenAI--compatible-APIs-412991?logo=openai&logoColor=white">
   <img alt="Neo4j" src="https://img.shields.io/badge/Neo4j-Graph%20Memory-4581C3?logo=neo4j&logoColor=white">
