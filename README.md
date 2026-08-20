@@ -1,6 +1,7 @@
 # MemMark
 
 <p align="center">
+  <a href="https://arxiv.org/abs/2605.25002"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2605.25002-b31b1b.svg"></a>
   <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white">
   <img alt="OpenAI-compatible APIs" src="https://img.shields.io/badge/OpenAI--compatible-APIs-412991?logo=openai&logoColor=white">
   <img alt="Neo4j" src="https://img.shields.io/badge/Neo4j-Graph%20Memory-4581C3?logo=neo4j&logoColor=white">
@@ -253,6 +254,21 @@ Use `--output /custom/path.json` to choose a path manually. Use `--save-checkpoi
 - A-MEM runs can be slow because each turn may trigger memory evolution through the backend's native LLM path.
 - Graphiti runs can be substantially slower and depend on Neo4j state; clear or isolate the graph between independent experiments if needed.
 - Do not commit `.env`, `results/`, local model directories, or virtual environments.
+
+## Citation
+
+If you find MemMark useful, please cite:
+
+```bibtex
+@article{zhang2026memmark,
+  title   = {MemMark: State-Evolution Attribution Watermarking for Agent Long-Term Memory Systems},
+  author  = {Zhang, Haobo and Mao, Xutao and Dong, Guangyuan and Li, Ziwei and Su, Xuanbo and Chen, Kaijie and Yang, Jing and Lin, Zheng},
+  journal = {arXiv preprint arXiv:2605.25002},
+  year    = {2026},
+  doi     = {10.48550/arXiv.2605.25002},
+  url     = {https://arxiv.org/abs/2605.25002}
+}
+```
 
 ## License
 
