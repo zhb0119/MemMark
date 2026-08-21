@@ -1,6 +1,7 @@
 # MemMark
 
 <p align="center">
+  <a href="https://2026.emnlp.org/"><img alt="Findings of EMNLP 2026" src="https://img.shields.io/badge/Findings%20of%20EMNLP-2026-6B4EFF"></a>
   <a href="https://arxiv.org/abs/2605.25002"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2605.25002-b31b1b.svg"></a>
   <a href="https://henrymao2004.github.io/MemMark/"><img alt="Project Page" src="https://img.shields.io/badge/Project-Page-4F46E5.svg"></a>
   <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white">
@@ -12,6 +13,8 @@
 </p>
 
 Code release for reproducing the MemMark experiments on LoCoMo with the A-MEM and Graphiti memory backends.
+
+🎉 Accepted to **Findings of EMNLP 2026**.
 
 MemMark studies watermarking for agent memory systems: the watermark is embedded at memory-evolution decision points while preserving the native behavior of the underlying memory backend. This repository contains the cleaned reproduction harness used for the LoCoMo experiments, including backend adapters, audit/verification utilities, metric computation, and sanitized launch scripts.
 

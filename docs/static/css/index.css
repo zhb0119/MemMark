@@ -199,9 +199,33 @@ h3 {
 
 .hero-subtitle {
   max-width: 760px;
-  margin: 28px auto 34px;
+  margin: 28px auto 22px;
   color: #c7d0e9;
   font-size: clamp(1.05rem, 2vw, 1.25rem);
+}
+
+.venue-pill {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 30px;
+  padding: 8px 14px;
+  color: #fff3dc;
+  background: rgba(255, 185, 103, .12);
+  border: 1px solid rgba(255, 185, 103, .4);
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.venue-pill span {
+  color: var(--accent);
+}
+
+.venue-pill:hover,
+.venue-pill:focus-visible {
+  background: rgba(255, 185, 103, .2);
 }
 
 .authors {
