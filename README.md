@@ -14,6 +14,8 @@
 
 Code release for reproducing the MemMark experiments on LoCoMo with the A-MEM and Graphiti memory backends.
 
+Project homepage: [https://henrymao2004.github.io/MemMark/](https://henrymao2004.github.io/MemMark/)
+
 🎉 Accepted to **Findings of EMNLP 2026**.
 
 MemMark studies watermarking for agent memory systems: the watermark is embedded at memory-evolution decision points while preserving the native behavior of the underlying memory backend. This repository contains the cleaned reproduction harness used for the LoCoMo experiments, including backend adapters, audit/verification utilities, metric computation, and sanitized launch scripts.
